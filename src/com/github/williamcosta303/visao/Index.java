@@ -292,7 +292,7 @@ public class Index extends javax.swing.JFrame {
     }//GEN-LAST:event_CcMouseClicked
 
     private void mAjudaSobreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mAjudaSobreActionPerformed
-        JOptionPane.showMessageDialog(this, "TicTacToe (Jogo-da-velha)\n1.0\n\nDesenvolvido por: William A. Costa\nhttps://github.com/williamcosta303", "SOBRE", JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(this, "TicTacToe (Jogo-da-velha)\n1.02\n\nDesenvolvido por: William A. Costa\nhttps://github.com/williamcosta303", "SOBRE", JOptionPane.PLAIN_MESSAGE);
     }//GEN-LAST:event_mAjudaSobreActionPerformed
 
     private void mJogoEstatisticasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mJogoEstatisticasActionPerformed
