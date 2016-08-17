@@ -1,6 +1,7 @@
 package com.github.williamcosta303.visao;
 
 import java.awt.Toolkit;
+import com.github.williamcosta303.utilitarios.Arquivo;
 import javax.swing.JOptionPane;
 import java.util.Random;
 
@@ -23,7 +24,7 @@ import java.util.Random;
     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
     WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-    DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+    DISCLAIMED. IN NO EVENT SHALL WILLIAM A. COSTA BE LIABLE FOR ANY
     DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
     (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -33,12 +34,17 @@ import java.util.Random;
 */
 public class Index extends javax.swing.JFrame {
 
+    // Variáveis
     int[] valor = {0,0,0,0,0,0,0,0,0};
     int vitorias, derrotas, empates;
     boolean primeiroMovimento;
     
+    // Classes
+    Arquivo A = new Arquivo();
+    
     public Index() {
         initComponents();
+        this.lerEstatisticas();
     }
 
     /**
@@ -67,10 +73,15 @@ public class Index extends javax.swing.JFrame {
         mAjuda = new javax.swing.JMenu();
         mAjudaSobre = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("TicTacToe");
         setIconImage(Toolkit.getDefaultToolkit().getImage(Index.class.getResource("/com/github/williamcosta303/imagens/icone.png")));
         setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         Ba.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         Ba.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -291,6 +302,10 @@ public class Index extends javax.swing.JFrame {
     private void mJogoNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mJogoNovoActionPerformed
         this.novoJogo(true);
     }//GEN-LAST:event_mJogoNovoActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        A.salvarArquivo(this.vitorias + "," + this.empates + "," + this.derrotas);
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments
@@ -647,6 +662,16 @@ public class Index extends javax.swing.JFrame {
             } else {
                 JOptionPane.showMessageDialog(this, "Jogo não foi inciado!", "ERRO", JOptionPane.WARNING_MESSAGE);
             }
+        }
+    }
+    
+    private void lerEstatisticas(){
+        String tmp = A.lerArquivo();
+        if(!tmp.equals("ERRO")){
+            String valores[] = tmp.split(",");
+            this.vitorias = Integer.parseInt(valores[0]);
+            this.empates = Integer.parseInt(valores[1]);
+            this.derrotas = Integer.parseInt(valores[2]);
         }
     }
 
