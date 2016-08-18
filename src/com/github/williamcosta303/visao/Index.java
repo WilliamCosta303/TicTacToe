@@ -5,7 +5,6 @@ import com.github.williamcosta303.utilitarios.Arquivo;
 import javax.swing.JOptionPane;
 import java.util.Random;
 
-
 /*
     Copyright (c) 2016, William A. Costa
     All rights reserved.
@@ -32,12 +31,13 @@ import java.util.Random;
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 public class Index extends javax.swing.JFrame {
 
     // Variáveis
     int[] valor = {0,0,0,0,0,0,0,0,0};
     int vitorias, derrotas, empates;
-    boolean primeiroMovimento;
+    boolean primeiroMovimento, isJogX = true;
     
     // Classes
     Arquivo A = new Arquivo();
@@ -68,8 +68,10 @@ public class Index extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         mJogo = new javax.swing.JMenu();
         mJogoNovo = new javax.swing.JMenuItem();
+        mJogoJogarX = new javax.swing.JCheckBoxMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         mJogoEstatisticas = new javax.swing.JMenuItem();
+        mJogoZerar = new javax.swing.JMenuItem();
         mAjuda = new javax.swing.JMenu();
         mAjudaSobre = new javax.swing.JMenuItem();
 
@@ -173,6 +175,15 @@ public class Index extends javax.swing.JFrame {
             }
         });
         mJogo.add(mJogoNovo);
+
+        mJogoJogarX.setSelected(true);
+        mJogoJogarX.setText("Jogar com X");
+        mJogoJogarX.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mJogoJogarXActionPerformed(evt);
+            }
+        });
+        mJogo.add(mJogoJogarX);
         mJogo.add(jSeparator1);
 
         mJogoEstatisticas.setText("Estatísticas");
@@ -182,6 +193,14 @@ public class Index extends javax.swing.JFrame {
             }
         });
         mJogo.add(mJogoEstatisticas);
+
+        mJogoZerar.setText("Zerar Estatísticas");
+        mJogoZerar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mJogoZerarActionPerformed(evt);
+            }
+        });
+        mJogo.add(mJogoZerar);
 
         jMenuBar1.add(mJogo);
 
@@ -292,7 +311,7 @@ public class Index extends javax.swing.JFrame {
     }//GEN-LAST:event_CcMouseClicked
 
     private void mAjudaSobreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mAjudaSobreActionPerformed
-        JOptionPane.showMessageDialog(this, "TicTacToe (Jogo-da-velha)\n1.02\n\nDesenvolvido por: William A. Costa\nhttps://github.com/williamcosta303", "SOBRE", JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(this, "TicTacToe (Jogo-da-velha)\n1.1\n\nDesenvolvido por: William A. Costa\nhttps://github.com/williamcosta303", "SOBRE", JOptionPane.PLAIN_MESSAGE);
     }//GEN-LAST:event_mAjudaSobreActionPerformed
 
     private void mJogoEstatisticasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mJogoEstatisticasActionPerformed
@@ -307,9 +326,29 @@ public class Index extends javax.swing.JFrame {
         A.salvarArquivo(this.vitorias + "," + this.empates + "," + this.derrotas);
     }//GEN-LAST:event_formWindowClosing
 
+    private void mJogoZerarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mJogoZerarActionPerformed
+        int confirma = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja zerar as estatísticas?", "CONFIRMAR", JOptionPane.YES_NO_OPTION);
+        if(confirma == JOptionPane.YES_OPTION){
+            this.vitorias = 0;
+            this.empates = 0;
+            this.derrotas = 0;
+            JOptionPane.showMessageDialog(this, "Estatísticas zeradas com sucesso!", "SUCESSO", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_mJogoZerarActionPerformed
+
+    private void mJogoJogarXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mJogoJogarXActionPerformed
+        if(!primeiroMovimento){
+            isJogX = this.mJogoJogarX.getState();
+        } else {
+            JOptionPane.showMessageDialog(this, "É necessário terminar o jogo atual antes!", "AVISO", JOptionPane.WARNING_MESSAGE);
+            mJogoJogarX.setState(isJogX);
+        }
+    }//GEN-LAST:event_mJogoJogarXActionPerformed
+
     /**
      * @param args the command line arguments
      */
+    
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -343,6 +382,9 @@ public class Index extends javax.swing.JFrame {
     }
     
     private boolean jogaCampo(int campo, boolean isComputador){
+        /*
+        Retorno true ou false para verificar a jogada do jogador
+        */
         this.primeiroMovimento = true;
         if(!isComputador){
             // Jogador
@@ -596,10 +638,18 @@ public class Index extends javax.swing.JFrame {
         String resultado;
         switch(valor){
             case 1:
-                resultado = "X";
+                if(isJogX){
+                    resultado = "X";
+                } else {
+                    resultado = "O";
+                }
                 break;
             case 2:
-                resultado = "O";
+                if(isJogX){
+                    resultado = "O";
+                } else {
+                    resultado = "X";
+                }
                 break;
             default:
                 resultado = "-";
@@ -691,6 +741,8 @@ public class Index extends javax.swing.JFrame {
     private javax.swing.JMenuItem mAjudaSobre;
     private javax.swing.JMenu mJogo;
     private javax.swing.JMenuItem mJogoEstatisticas;
+    private javax.swing.JCheckBoxMenuItem mJogoJogarX;
     private javax.swing.JMenuItem mJogoNovo;
+    private javax.swing.JMenuItem mJogoZerar;
     // End of variables declaration//GEN-END:variables
 }
