@@ -1,6 +1,9 @@
 package com.github.williamcosta303.utilitarios;
 
 import java.io.*;
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
+
 
 /*
     Copyright (c) 2016, William A. Costa
@@ -33,21 +36,31 @@ public class Arquivo {
     
     public void salvarArquivo(String conteudo){
         try(PrintWriter writer = new PrintWriter("estat.dat", "UTF-8")){
-            writer.println(conteudo);
+            BASE64Encoder BE = new BASE64Encoder();
+            String valorCodificado = BE.encode(conteudo.getBytes());
+            writer.println(valorCodificado);
             writer.close();
         }catch (FileNotFoundException | UnsupportedEncodingException erro){
             System.out.println("Erro gerando arquivo");
         }
     }
     
-    public String lerArquivo(){
+    public String lerArquivo() throws IOException{
+        // Inicia uma String para ser o resultado
         String resultado;
-        try(BufferedReader BR = new BufferedReader(new FileReader("estat.dat"))){
-            resultado = BR.readLine();
-        }catch(IOException IOE){
-            resultado = "ERRO";
-        }
-        return resultado;
+        
+        // Começa a leitura do arquivo
+        BufferedReader BR = new BufferedReader(new FileReader("estat.dat"));
+        // Lê as linhas dos arquivo
+        resultado = BR.readLine();
+        
+        // Inicia o decodificador
+        BASE64Decoder BD = new BASE64Decoder();
+        // Decodifica o valor
+        byte[] valorCodificado = BD.decodeBuffer(resultado);
+        
+        // Retorna o valor decodificado em String
+        return new String (valorCodificado);
     }
     
 }

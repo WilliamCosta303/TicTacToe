@@ -2,6 +2,9 @@ package com.github.williamcosta303.visao;
 
 import java.awt.Toolkit;
 import com.github.williamcosta303.utilitarios.Arquivo;
+import java.io.FileNotFoundException;
+import java.io.IOError;
+import java.io.IOException;
 import javax.swing.JOptionPane;
 import java.util.Random;
 
@@ -37,14 +40,19 @@ public class Index extends javax.swing.JFrame {
     // Variáveis
     int[] valor = {0,0,0,0,0,0,0,0,0};
     int vitorias, derrotas, empates;
-    boolean primeiroMovimento, isJogX = true;
+    boolean primeiroMovimento, isJogX = true, computadorInicia = false;
     
     // Classes
     Arquivo A = new Arquivo();
     
     public Index() {
         initComponents();
-        this.lerEstatisticas();
+        try{
+            this.lerEstatisticas();
+            this.atualizarCampos();
+        }catch(ArrayIndexOutOfBoundsException antigo){
+            JOptionPane.showMessageDialog(this, "Estatísticas de versão anterior importadas!\nAo fechar o jogo a nova versão será salva", "AVISO", JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     /**
@@ -311,7 +319,7 @@ public class Index extends javax.swing.JFrame {
     }//GEN-LAST:event_CcMouseClicked
 
     private void mAjudaSobreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mAjudaSobreActionPerformed
-        JOptionPane.showMessageDialog(this, "TicTacToe (Jogo-da-velha)\n1.1\n\nDesenvolvido por: William A. Costa\nhttps://github.com/williamcosta303", "SOBRE", JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(this, "TicTacToe (Jogo-da-velha)\n1.2\n\nDesenvolvido por: William A. Costa\nhttps://github.com/williamcosta303", "SOBRE", JOptionPane.PLAIN_MESSAGE);
     }//GEN-LAST:event_mAjudaSobreActionPerformed
 
     private void mJogoEstatisticasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mJogoEstatisticasActionPerformed
@@ -323,7 +331,11 @@ public class Index extends javax.swing.JFrame {
     }//GEN-LAST:event_mJogoNovoActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        A.salvarArquivo(this.vitorias + "," + this.empates + "," + this.derrotas);
+        String conteudo = this.vitorias + "," + this.empates + "," + this.derrotas + "," + this.isJogX + "," + this.computadorInicia;
+        for(int i = 0; i < 9; i++){
+            conteudo += "," + valor[i];
+        }
+        A.salvarArquivo(conteudo);
     }//GEN-LAST:event_formWindowClosing
 
     private void mJogoZerarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mJogoZerarActionPerformed
@@ -337,12 +349,17 @@ public class Index extends javax.swing.JFrame {
     }//GEN-LAST:event_mJogoZerarActionPerformed
 
     private void mJogoJogarXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mJogoJogarXActionPerformed
-        if(!primeiroMovimento){
-            isJogX = this.mJogoJogarX.getState();
+        isJogX = this.mJogoJogarX.getState();
+        this.atualizarCampos();
+        
+        String tmpMsg;
+        if(isJogX){
+            tmpMsg = "X";
         } else {
-            JOptionPane.showMessageDialog(this, "É necessário terminar o jogo atual antes!", "AVISO", JOptionPane.WARNING_MESSAGE);
-            mJogoJogarX.setState(isJogX);
+            tmpMsg = "O";
         }
+        
+        JOptionPane.showMessageDialog(this, "Você agora está jogando com '" + tmpMsg + "'!", "AVISO", JOptionPane.WARNING_MESSAGE);
     }//GEN-LAST:event_mJogoJogarXActionPerformed
 
     /**
@@ -671,18 +688,27 @@ public class Index extends javax.swing.JFrame {
                     if(this.verificaVitoria(false) == 2){
                         // Computador ganhou
                         JOptionPane.showMessageDialog(this, "O computador ganhou!", "DERROTA", JOptionPane.WARNING_MESSAGE);
+                        computadorInicia = !computadorInicia;
                         this.derrotas++;
+                        this.novoJogo(false);
+                    } else if(this.verificaVitoria(false) == 3){
+                        // Empatou
+                        JOptionPane.showMessageDialog(this, "Empatou!", "EMPATE", JOptionPane.PLAIN_MESSAGE);
+                        computadorInicia = !computadorInicia;
+                        this.empates++;
                         this.novoJogo(false);
                     }
                 } else {
                     // Jogador ganhou
                     JOptionPane.showMessageDialog(this, "O jogador ganhou!", "VITÓRIA", JOptionPane.INFORMATION_MESSAGE);
+                    computadorInicia = !computadorInicia;
                     this.vitorias++;
                     this.novoJogo(false);
                 }
             } else {
                 // Empatou
                 JOptionPane.showMessageDialog(this, "Empatou!", "EMPATE", JOptionPane.PLAIN_MESSAGE);
+                computadorInicia = !computadorInicia;
                 this.empates++;
                 this.novoJogo(false);
             }
@@ -697,16 +723,31 @@ public class Index extends javax.swing.JFrame {
             for(int i = 0; i < 9; i++){
                 valor[i] = 0;
             }
+            
+            // Verifica se o computador inicia
+            if(computadorInicia){
+                this.jogaCampo(this.vezComputador(), true);
+            }
+            
             this.atualizarCampos();
         } else {
             if(primeiroMovimento){
                 int confirma = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja iniciar um novo jogo?\n(ISSO CONTA COMO DERROTA NAS ESTATÍSTICAS)", "CONFIRMAÇÃO", JOptionPane.YES_NO_OPTION);
                 if(confirma == JOptionPane.YES_OPTION){
+                    // Adiciona uma derrota e troca a vez
                     this.derrotas++;
+                    computadorInicia = !computadorInicia;
+                    
                     this.primeiroMovimento = false;
                     for(int i = 0; i < 9; i++){
                         valor[i] = 0;
                     }
+                    
+                    // Verifica se o computador inicia
+                    if(computadorInicia){
+                        this.jogaCampo(this.vezComputador(), true);
+                    }
+                    
                     this.atualizarCampos();
                 }
             } else {
@@ -716,12 +757,30 @@ public class Index extends javax.swing.JFrame {
     }
     
     private void lerEstatisticas(){
-        String tmp = A.lerArquivo();
-        if(!tmp.equals("ERRO")){
-            String valores[] = tmp.split(",");
-            this.vitorias = Integer.parseInt(valores[0]);
-            this.empates = Integer.parseInt(valores[1]);
-            this.derrotas = Integer.parseInt(valores[2]);
+        try{
+            String tmp = A.lerArquivo();
+            if(!tmp.equals("ERRO")){
+                String valores[] = tmp.split(",");
+                this.vitorias = Integer.parseInt(valores[0]);
+                this.empates = Integer.parseInt(valores[1]);
+                this.derrotas = Integer.parseInt(valores[2]);
+                this.isJogX = Boolean.parseBoolean(valores[3]);
+                this.computadorInicia = Boolean.parseBoolean(valores[4]);
+
+                // Altera o valor dependendo da escolha do jogador
+                this.mJogoJogarX.setState(isJogX);
+
+                // Reseta o jogo para como estava antes de fechar
+                for(int i = 0; i < 9; i++){
+                    valor[i] = Integer.parseInt(valores[5+i]);
+                }
+            }
+        } catch(FileNotFoundException FNFE){
+            // Silenciosamente ignora o erro de não localizar o arquivo
+        } catch(NumberFormatException NFE){
+            JOptionPane.showMessageDialog(this, "O arquivo de estatísticas parece estar corrompido!\nImpossível restaurar informações!", "ERRO", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException IOE){
+            JOptionPane.showMessageDialog(this, "Erro ao carregar estatísticas, favor reportar esse erro!\nCausa: " + IOE.getMessage(), "ERRO", JOptionPane.ERROR_MESSAGE);
         }
     }
 
